@@ -174,7 +174,7 @@ if args.parameter == 'empty':
 
 
 
-
+    time.sleep(8)
     # Working with paramiko library
     key = paramiko.RSAKey.from_private_key_file(key_file_path)
     client = paramiko.SSHClient()
@@ -182,26 +182,29 @@ if args.parameter == 'empty':
     
 
     shell_commands = [
-        'echo "start=2048, type=83" | sudo sfdisk /dev/xvdz',
-        'mkdir /home/ubuntu/mountpoint',
-        'sudo chown ubuntu:ubuntu /home/ubuntu/mountpoint',
         'sudo apt update && sudo apt -y install apache2 git',
-        'mkdir /home/ubuntu/mountpoint && cd /home/ubuntu/mountpoint && git init',
+        'echo y | sudo mkfs.ext4 /dev/xvdz',
+        'mkdir /home/ubuntu/mountpoint && sudo mount /dev/xvdz /home/ubuntu/mountpoint',
+        'sudo chown ubuntu:ubuntu /home/ubuntu/mountpoint',
+        'cd /home/ubuntu/mountpoint && git init',
         'cd /home/ubuntu/mountpoint && git clone https://proffase@github.com/proffase/io-opsworks-script.git',
-        'chmod 755 /home/ubuntu/mountpoint/io-opsworks-script/aws-script.py',
         'python3 /home/ubuntu/mountpoint/io-opsworks-script/aws-script.py start'
     ]
 
-    # Commands for managing disks/partitions (mkfs, sfdisk) are not working through paramiko for some reasons.
-    # 'echo "sudo mkfs.ext4 /dev/xvdz" > /tmp/format.sh;chmod 755 format.sh;sudo /bin/sh format.sh',
-    # 'mkdir /home/ubuntu/mountpoint && sudo mount /dev/xvdz /home/ubuntu/mountpoint'
-    # 'echo "start=2048, type=83" | sudo sfdisk /dev/xvdz'
+    
 
     # Connect/ssh to an instance
     print('Running commands through SSH...')
     try:
         
         client.connect(hostname=ec2_ip_addr, username="ubuntu", pkey=key)
+
+        # stdin, stdout, stderr = client.exec_command("sudo /bin/sh -c '"
+        #                                             "echo y | mkfs.ext4 /dev/xvdz"
+        #                                             "'")
+        # print(stdout.readlines())
+        # print(stderr.readlines())
+                                                    
 
         for command in shell_commands:
             client.invoke_shell()
