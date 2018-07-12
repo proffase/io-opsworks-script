@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import argparse
 
 
@@ -13,6 +14,7 @@ if args.parameter == 'empty':
     import os
     import time
     import paramiko
+    import select
 
     # Hardcoded values
     # key_pair_name = 'DennisF'
@@ -178,7 +180,9 @@ if args.parameter == 'empty':
         'sudo chown ubuntu:ubuntu /home/ubuntu/mountpoint',
         'sudo apt update && sudo apt -y install apache2 git',
         'mkdir /home/ubuntu/mountpoint && cd /home/ubuntu/mountpoint && git init',
-        'cd /home/ubuntu/mountpoint && git clone https://proffase@github.com/proffase/io-opsworks-script.git'
+        'cd /home/ubuntu/mountpoint && git clone https://proffase@github.com/proffase/io-opsworks-script.git',
+        'chmod 755 /home/ubuntu/mountpoint/io-opsworks-script/aws-script.py',
+        'touch /home/ubuntu/outputfile.txt && python3 /home/ubuntu/mountpoint/io-opsworks-script/aws-script.py start > /home/ubuntu/outputfile.txt 2>&1'
     ]
 
     # Command mkfs is not working through paramiko
@@ -192,12 +196,20 @@ if args.parameter == 'empty':
         client.connect(hostname=ec2_ip_addr, username="ubuntu", pkey=key)
 
         for command in shell_commands:
+            client.invoke_shell()
             stdin, stdout, stderr = client.exec_command(command)
-            exit_status = stdout.channel.recv_exit_status()
-            if exit_status == 0:
-                print (command + '........OK')
-            else:
-                print("Error", exit_status, stdin, stdout, stderr)
+            # exit_status = stdout.channel.recv_exit_status()
+            # if exit_status == 0:
+            #     print (command + '........OK')
+            # else:
+            #     print("Error", exit_status, stdin, stdout, stderr)
+            while not stdout.channel.exit_status_ready():
+                # Only print data if there is data to read in the channel
+                if stdout.channel.recv_ready():
+                    rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
+                    if len(rl) > 0:
+                        # Print data from stdout
+                        print(stdout.channel.recv(1024),)
             
             #print(stdout.read())
             #print(stderr.read())
@@ -209,8 +221,26 @@ if args.parameter == 'empty':
         print(e)
 
 
-elif args.parameter == 'start-http':
-    print('http start')
+elif args.parameter == 'start':
+    import subprocess
+    print('http starting...')
+
+    result = subprocess.run('sudo touch /var/www/html/.htaccess', stdout=subprocess.PIPE, shell=True).stdout.decode('utf-8')
+    # print(result)
+    result = subprocess.run('cd /var/www/html && echo \'AuthType Basic\nAuthName "Restricted Content"\nAuthUserFile /var/www/.htpasswd\nRequire valid-user\' | sudo tee .htaccess', stdout=subprocess.PIPE, shell=True).stdout.decode('utf-8')
+    # print(result)
+    result = subprocess.run('sudo touch /var/www/.htpasswd', stdout=subprocess.PIPE, shell=True).stdout.decode('utf-8')
+    # print(result)
+    result = subprocess.run('cd /var/www && echo "user:\$apr1\$lo/vS5iP\$c8ZvIWj5Cd3C7Y24ByVBS0" | sudo tee .htpasswd', stdout=subprocess.PIPE, shell=True).stdout.decode('utf-8')
+    # print(result)
+    result = subprocess.run('sudo sed -i "/<Directory \/var\/www\/>/,\@</Directory>@ s/None/All/g" /etc/apache2/apache2.conf && sudo service apache2 restart', stdout=subprocess.PIPE, shell=True).stdout.decode('utf-8')
+    # print(result)
+    result = subprocess.run('sudo a2enmod cgi && sudo service apache2 restart', stdout=subprocess.PIPE, shell=True).stdout.decode('utf-8')
+    # print(result)
+    result = subprocess.run('sudo touch /usr/lib/cgi-bin/script.cgi && sudo chmod 755 /usr/lib/cgi-bin/script.cgi', stdout=subprocess.PIPE, shell=True).stdout.decode('utf-8')
+    # print(result)
+    result = subprocess.run('cd /usr/lib/cgi-bin && echo "#! /bin/bash\necho \'Content-Type: text/plain\'\necho\ncd /home/ubuntu/mountpoint/io-opsworks-script && git log -1 --stat\necho\nps -C apache2 -o %cpu,%mem,cmd" | sudo tee script.cgi', stdout=subprocess.PIPE, shell=True).stdout.decode('utf-8')
+    # print(result)
 
 else:
-    print(args.parameter)
+    print('Incorrect parameter:', args.parameter)
