@@ -243,6 +243,7 @@ elif args.parameter == 'start':
     # print(result)
     result = subprocess.run('cd /usr/lib/cgi-bin && echo "#! /bin/bash\necho \'Content-Type: text/plain\'\necho\ncd /home/ubuntu/mountpoint/io-opsworks-script && git log -1 --stat\necho\nps -C apache2 -o %cpu,%mem,cmd" | sudo tee script.cgi', stdout=subprocess.PIPE, shell=True).stdout.decode('utf-8')
     # print(result)
-
+    result = subprocess.run('cd /home/ubuntu/mountpoint/io-opsworks-script/.git/hooks && touch post-commit && chmod 755 post-commit', stdout=subprocess.PIPE, shell=True).stdout.decode('utf-8')
+    result = subprocess.run('cd /home/ubuntu/mountpoint/io-opsworks-script/.git/hooks && echo "#!/bin/sh\nexec sudo systemctl restart apache2" | tee post-commit', stdout=subprocess.PIPE, shell=True).stdout.decode('utf-8')
 else:
     print('Incorrect parameter:', args.parameter)
