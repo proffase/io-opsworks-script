@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import argparse
 
+print('git pull hook check')
 
 parser = argparse.ArgumentParser(description='Playing with AWS')
 parser.add_argument('parameter', nargs='?', default='empty')
