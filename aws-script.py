@@ -176,7 +176,8 @@ if args.parameter == 'empty':
     
 
     shell_commands = [
-        'mkdir /home/ubuntu/mountpoint',
+        'sudo mkfs.ext4 /dev/xvdz',
+        'mkdir /home/ubuntu/mountpoint && sudo mount /dev/xvdz /home/ubuntu/mountpoint',
         'sudo chown ubuntu:ubuntu /home/ubuntu/mountpoint',
         'sudo apt update && sudo apt -y install apache2 git',
         'mkdir /home/ubuntu/mountpoint && cd /home/ubuntu/mountpoint && git init',
@@ -219,6 +220,8 @@ if args.parameter == 'empty':
 
     except Exception as e:
         print(e)
+
+    print('Basic auth: username=user\npassword=password\nhttp output available at: http://{}/cgi-bin/script.cgi'.format(ec2_ip_addr))
 
 
 elif args.parameter == 'start':
