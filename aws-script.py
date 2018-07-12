@@ -12,6 +12,7 @@ if args.parameter == 'empty':
     import random
     import os
     import time
+    import paramiko
 
     # Hardcoded values
     # key_pair_name = 'DennisF'
@@ -102,7 +103,7 @@ if args.parameter == 'empty':
     # Getting public IP of created instance
     instances[0].load()
     print('IP is:', instances[0].public_ip_address)
-    ip_addr = instances[0].public_ip_address
+    ec2_ip_addr = instances[0].public_ip_address
 
 
     # Create security group
@@ -164,6 +165,48 @@ if args.parameter == 'empty':
         os.remove(token_path)
     else:
         print('Error: cannot delete. Token file not found at:', token_path)
+
+
+
+    key = paramiko.RSAKey.from_private_key_file(key_file_path)
+    client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    
+
+    shell_commands = [
+        'mkdir /home/ubuntu/mountpoint',
+        'sudo chown ubuntu:ubuntu /home/ubuntu/mountpoint',
+        'sudo apt update && sudo apt -y install apache2 git',
+        'mkdir /home/ubuntu/mountpoint && cd /home/ubuntu/mountpoint && git init',
+        'cd /home/ubuntu/mountpoint && git clone https://proffase@github.com/proffase/io-opsworks-script.git'
+    ]
+
+    # Command mkfs is not working through paramiko
+    # 'echo "sudo mkfs.ext4 /dev/xvdz" > /tmp/format.sh;chmod 755 format.sh;sudo /bin/sh format.sh',
+    # 'mkdir /home/ubuntu/mountpoint && sudo mount /dev/xvdz /home/ubuntu/mountpoint'
+
+    # Connect/ssh to an instance
+    print('Running commands through SSH...')
+    try:
+        
+        client.connect(hostname=ec2_ip_addr, username="ubuntu", pkey=key)
+
+        for command in shell_commands:
+            stdin, stdout, stderr = client.exec_command(command)
+            exit_status = stdout.channel.recv_exit_status()
+            if exit_status == 0:
+                print (command + '........OK')
+            else:
+                print("Error", exit_status, stdin, stdout, stderr)
+            
+            #print(stdout.read())
+            #print(stderr.read())
+
+
+        client.close()
+
+    except Exception as e:
+        print(e)
 
 
 elif args.parameter == 'start-http':
