@@ -176,8 +176,7 @@ if args.parameter == 'empty':
     
 
     shell_commands = [
-        'sudo mkfs.ext4 /dev/xvdz',
-        'mkdir /home/ubuntu/mountpoint && sudo mount /dev/xvdz /home/ubuntu/mountpoint',
+        'mkdir /home/ubuntu/mountpoint',
         'sudo chown ubuntu:ubuntu /home/ubuntu/mountpoint',
         'sudo apt update && sudo apt -y install apache2 git',
         'mkdir /home/ubuntu/mountpoint && cd /home/ubuntu/mountpoint && git init',
