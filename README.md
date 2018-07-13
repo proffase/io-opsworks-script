@@ -4,15 +4,19 @@ A test python script to work with AWS implemented as a testing case.
 
 ## Getting Started
 
-Configure AWS profile, clone repo, update hardcoded VPC, region and desired token save path. Then run with python.
+Configure local AWS profile, clone repo, update hardcoded VPC, region and desired token save path.
 
-Script is intended to run without parameters locally and execute itself with "start" parameter when uploaded to server.
+Run locally:
+pip install -r requirements.txt
+python aws-script.py
+
+Run on the server:
+python aws-script.py start
+
 
 ### Prerequisites
 
 Described in requirements.txt
 
 ### Known issues
-
-mkfs commands cannot run through SSH session invoked by paramiko library.
 
