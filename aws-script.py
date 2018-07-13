@@ -174,7 +174,7 @@ if args.parameter == 'empty':
 
 
 
-    time.sleep(3)
+    time.sleep(5)
     # Working with paramiko library
     key = paramiko.RSAKey.from_private_key_file(key_file_path)
     client = paramiko.SSHClient()
@@ -240,7 +240,7 @@ elif args.parameter == 'start':
         'sudo sed -i "/<Directory \/var\/www\/>/,\@</Directory>@ s/None/All/g" /etc/apache2/apache2.conf && sudo service apache2 restart',
         'sudo a2enmod cgi && sudo systemctl restart apache2',
         'sudo touch /usr/lib/cgi-bin/script.cgi && sudo chmod 755 /usr/lib/cgi-bin/script.cgi',
-        'cd /usr/lib/cgi-bin && echo "#! /bin/bash\necho \'Content-Type: text/plain\'\necho \'Latest commit details:\'\ncd /home/ubuntu/mountpoint/io-opsworks-script && git log -1 --stat\necho \'Apache statistics:\'\nps -C apache2 -o %cpu,%mem,cmd" | sudo tee script.cgi',
+        'cd /usr/lib/cgi-bin && echo "#! /bin/bash\necho \'Content-Type: text/plain\'\necho\necho \'Latest commit details:\'\ncd /home/ubuntu/mountpoint/io-opsworks-script && git log -1 --stat\necho \'Apache statistics:\'\nps -C apache2 -o %cpu,%mem,cmd" | sudo tee script.cgi',
         'echo "<html>\n<iframe src=\'/cgi-bin/script.cgi\' width=\'600\' height=\'600\'>\n</html>" | sudo tee /var/www/html/index.html',
         'cd /home/ubuntu/mountpoint/io-opsworks-script/.git/hooks && touch post-merge && chmod 755 post-merge',
         'cd /home/ubuntu/mountpoint/io-opsworks-script/.git/hooks && echo "#!/bin/sh\nexec sudo systemctl restart apache2" | tee post-merge'
