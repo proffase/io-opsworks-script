@@ -92,8 +92,6 @@ if args.parameter == 'empty':
                                         ]
     )
 
-    print(instances)
-    time.sleep(20)
 
     instances[0].wait_until_running()
     print('EC2 instance successfully created, ec2_id =', instances[0].id)
@@ -225,7 +223,7 @@ if args.parameter == 'empty':
 
     except Exception as e:
         print(e)
-        sys.exit(1)
+        os.sys.exit(1)
 
 
     print('Basic auth: username=user\npassword=password\nhttp output available at: http://{}/index.html'.format(ec2_ip_addr))
