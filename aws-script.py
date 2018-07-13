@@ -224,7 +224,7 @@ if args.parameter == 'empty':
         print(e)
 
 
-    print('Basic auth: username=user\npassword=password\nhttp output available at: http://{}/cgi-bin/script.cgi'.format(ec2_ip_addr))
+    print('Basic auth: username=user\npassword=password\nhttp output available at: http://{}/index.html'.format(ec2_ip_addr))
 
 
 
@@ -241,7 +241,7 @@ elif args.parameter == 'start':
         'sudo a2enmod cgi && sudo systemctl restart apache2',
         'sudo touch /usr/lib/cgi-bin/script.cgi && sudo chmod 755 /usr/lib/cgi-bin/script.cgi',
         'cd /usr/lib/cgi-bin && echo "#! /bin/bash\necho \'Content-Type: text/plain\'\necho\'Latest commit details:\'\ncd /home/ubuntu/mountpoint/io-opsworks-script && git log -1 --stat\necho\'Apache statistics:\'\nps -C apache2 -o %cpu,%mem,cmd" | sudo tee script.cgi',
-        'echo "<html>\n<iframe src=\'/cgi-bin/script.cgi\' width=\'600\' height=\'600\'>\n</html>" | sudo tee /var/www/html/index.html'
+        'echo "<html>\n<iframe src=\'/cgi-bin/script.cgi\' width=\'600\' height=\'600\'>\n</html>" | sudo tee /var/www/html/index.html',
         'cd /home/ubuntu/mountpoint/io-opsworks-script/.git/hooks && touch post-merge && chmod 755 post-merge',
         'cd /home/ubuntu/mountpoint/io-opsworks-script/.git/hooks && echo "#!/bin/sh\nexec sudo systemctl restart apache2" | tee post-merge'
     ]
