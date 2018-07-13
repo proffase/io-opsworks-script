@@ -92,6 +92,9 @@ if args.parameter == 'empty':
                                         ]
     )
 
+    print(instances)
+    time.sleep(20)
+
     instances[0].wait_until_running()
     print('EC2 instance successfully created, ec2_id =', instances[0].id)
     ec2_id = instances[0].id
@@ -174,7 +177,7 @@ if args.parameter == 'empty':
 
 
 
-    time.sleep(5)
+    
     # Working with paramiko library
     key = paramiko.RSAKey.from_private_key_file(key_file_path)
     client = paramiko.SSHClient()
@@ -191,7 +194,7 @@ if args.parameter == 'empty':
         'python3 /home/ubuntu/mountpoint/io-opsworks-script/aws-script.py start'
     ]
 
-    
+    time.sleep(5)
 
     # Connect/ssh to an instance
     print('Running commands through SSH...')
