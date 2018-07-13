@@ -225,6 +225,7 @@ if args.parameter == 'empty':
 
     except Exception as e:
         print(e)
+        sys.exit(1)
 
 
     print('Basic auth: username=user\npassword=password\nhttp output available at: http://{}/index.html'.format(ec2_ip_addr))
