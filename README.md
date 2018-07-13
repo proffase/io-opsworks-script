@@ -13,6 +13,9 @@ python aws-script.py
 Run on the server:
 python aws-script.py start
 
+Basic auth details:
+username: user
+password: password
 
 ### Prerequisites
 
