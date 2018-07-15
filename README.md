@@ -10,8 +10,9 @@ Run locally:
 pip install -r requirements.txt
 python aws-script.py
 
-Run on the server:
+The script will run itself on server with:
 python aws-script.py start
+Not intended to be run locally with 'start' parameter.
 
 Basic auth details:
 username: user
